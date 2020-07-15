@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Quiz.Api.Hubs;
+using Quiz.Api.Jwt;
 using Quiz.Api.Repositories;
 using Quiz.Api.Repositories.Interfaces;
+using Quiz.Api.SignalR.Hubs;
 
 namespace Quiz.Api
 {
@@ -35,6 +36,7 @@ namespace Quiz.Api
                 .WithOrigins(allowedHosts);
             }));
 
+            services.AddSingleton<JwtManager>();
             ConfigureRepositories(services);
         }
 
@@ -63,7 +65,6 @@ namespace Quiz.Api
 
         private void ConfigureRepositories(IServiceCollection services)
         {
-            services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
             services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
         }
     }
