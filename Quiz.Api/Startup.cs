@@ -21,6 +21,8 @@ namespace Quiz.Api
         {
             services.AddControllers();
             services.AddSignalR();
+
+            ConfigureRepositories(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +44,11 @@ namespace Quiz.Api
                 endpoints.MapControllers();
                 endpoints.MapHub<BuzzerHub>("/BuzzerHub");
             });
+        }
+
+        private void ConfigureRepositories(IServiceCollection services)
+        {
+
         }
     }
 }

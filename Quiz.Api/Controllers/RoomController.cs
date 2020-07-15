@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Quiz.Api.Models;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Quiz.Api.Controllers
 {
@@ -14,11 +17,13 @@ namespace Quiz.Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public ActionResult<int> GetRoom([FromQuery] int id)
+        [HttpGet("rooms")]
+        public ActionResult<IEnumerable<Room>> GetRooms()
         {
-            _logger.LogInformation("GetRoom called");
-            return 0;
+            return new List<Room>()
+            {
+                new Room()
+            };
         }
     }
 }

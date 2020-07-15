@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/room",
+      "launchUrl": "api/room/rooms",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "Quiz.Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/room",
+      "launchUrl": "api/room/rooms",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
