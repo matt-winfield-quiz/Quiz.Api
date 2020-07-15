@@ -4,11 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quiz.Api.Hubs;
+using Quiz.Api.Repositories;
+using Quiz.Api.Repositories.Interfaces;
 
 namespace Quiz.Api
 {
     public class Startup
     {
+        private readonly string CorsPolicyName = "CorsPolicy";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -21,6 +25,15 @@ namespace Quiz.Api
         {
             services.AddControllers();
             services.AddSignalR();
+
+            string[] allowedHosts = Configuration.GetSection("CorsAllowedHosts").Get<string[]>();
+            services.AddCors(o => o.AddPolicy(CorsPolicyName, builder =>
+            {
+                builder.AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins(allowedHosts);
+            }));
 
             ConfigureRepositories(services);
         }
@@ -39,16 +52,19 @@ namespace Quiz.Api
 
             app.UseAuthorization();
 
+            app.UseCors(CorsPolicyName);
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<BuzzerHub>("/BuzzerHub");
+                endpoints.MapHub<QuizHub>("/QuizHub");
             });
         }
 
         private void ConfigureRepositories(IServiceCollection services)
         {
-
+            services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
+            services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
         }
     }
 }

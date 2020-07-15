@@ -1,6 +1,11 @@
-﻿namespace Quiz.Api.Repositories.Interfaces
+﻿using Quiz.Api.Models.Internal;
+using System.Collections.ObjectModel;
+
+namespace Quiz.Api.Repositories.Interfaces
 {
-    interface IRoomRepository
+    public interface IRoomRepository
     {
+        public ReadOnlyCollection<RoomInternalModel> GetRooms();
+        public int AddRoom(RoomInternalModel room);
     }
 }
