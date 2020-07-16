@@ -2,7 +2,7 @@
 {
     public class RoomDisplayModel
     {
-        public int Id;
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Quiz.Api.Models.Display;
 using Quiz.Api.Repositories.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Quiz.Api.Controllers
 {
@@ -24,7 +25,11 @@ namespace Quiz.Api.Controllers
         public ActionResult<IEnumerable<RoomDisplayModel>> GetRooms()
         {
             _logger.LogInformation("GetRooms 200 OK");
-            return Ok(_roomRepository.GetRooms());
+            var rooms = _roomRepository.GetRooms()
+                .Select(room => room.ToDisplayModel())
+                .ToList();
+
+            return Ok(rooms); ;
         }
     }
 }
