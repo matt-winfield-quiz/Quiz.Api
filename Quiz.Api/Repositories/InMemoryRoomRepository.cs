@@ -1,7 +1,10 @@
-﻿using Quiz.Api.Models.Internal;
+﻿using Quiz.Api.Models.Display;
+using Quiz.Api.Models.Internal;
 using Quiz.Api.Repositories.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Quiz.Api.Repositories
 {
@@ -20,6 +23,24 @@ namespace Quiz.Api.Repositories
             room.Id = _nextRoomId++;
             _rooms.Add(room);
             return room.Id;
+        }
+
+        public RoomInternalModel GetRoom(int roomId)
+        {
+            return _rooms.FirstOrDefault(room => room.Id == roomId);
+        }
+
+        public void AddUserToRoom(User user, int roomId)
+        {
+            var room = _rooms.FirstOrDefault(room => room.Id == roomId);
+
+            if (room == null)
+            {
+                throw new ArgumentException($"{roomId} not found!");
+            }
+
+            room.UsersInRoom.Add(user);
+            Console.WriteLine(room.ToString());
         }
     }
 }

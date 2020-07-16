@@ -66,6 +66,7 @@ namespace Quiz.Api
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
+            services.AddSingleton<IUserRepository, InMemoryUserRepository>();
         }
     }
 }

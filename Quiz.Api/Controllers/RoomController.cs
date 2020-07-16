@@ -24,12 +24,26 @@ namespace Quiz.Api.Controllers
         [HttpGet("rooms")]
         public ActionResult<IEnumerable<RoomDisplayModel>> GetRooms()
         {
-            _logger.LogInformation("GetRooms 200 OK");
+            _logger.LogInformation("GetRooms OK");
             var rooms = _roomRepository.GetRooms()
                 .Select(room => room.ToDisplayModel())
                 .ToList();
 
             return Ok(rooms); ;
+        }
+
+        [HttpGet]
+        public ActionResult<RoomDisplayModel> GetRoom([FromQuery] int roomId)
+        {
+            var room = _roomRepository.GetRoom(roomId);
+
+            if (room != null)
+            {
+                _logger.LogInformation("GetRoom OK");
+                return Ok(room);
+            }
+            _logger.LogInformation("GetRoom {roomId} not found", roomId);
+            return NotFound(room);
         }
     }
 }
