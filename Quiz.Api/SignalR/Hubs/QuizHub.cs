@@ -37,7 +37,7 @@ namespace Quiz.Api.SignalR.Hubs
             _logger.LogInformation("Created room {roomId} {roomName}", roomId, roomName);
 
             var token = _jwtManager.GenerateJwtToken(roomId);
-            await Clients.Caller.SendAsync(QuizHubMethods.RoomCreated, token);
+            await Clients.Caller.SendAsync(QuizHubMethods.RoomCreated, token, roomId);
         }
 
         public async Task JoinRoom(int roomId, string name)
