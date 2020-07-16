@@ -19,10 +19,18 @@ namespace Quiz.Api.Repositories
             return _users.FirstOrDefault(user => user.Id == id);
         }
 
+        public void RemoveUser(string id)
+        {
+            var user = GetUser(id);
+            if (user != null)
+            {
+                _users.Remove(user);
+            }
+        }
+
         public void UpdateUserName(string id, string name)
         {
             var user = GetUser(id);
-
             if (user != null)
             {
                 user.Name = name;

@@ -7,5 +7,6 @@ namespace Quiz.Api.Repositories.Interfaces
         public void CreateUser(User user);
         public void UpdateUserName(string id, string name);
         public User GetUser(string id);
+        public void RemoveUser(string id);
     }
 }

@@ -10,5 +10,6 @@ namespace Quiz.Api.Repositories.Interfaces
         int AddRoom(RoomInternalModel room);
         RoomInternalModel GetRoom(int roomId);
         void AddUserToRoom(User user, int roomId);
+        void RemoveUserFromAllRooms(User user);
     }
 }

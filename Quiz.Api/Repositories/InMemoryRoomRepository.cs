@@ -42,5 +42,13 @@ namespace Quiz.Api.Repositories
             room.UsersInRoom.Add(user);
             Console.WriteLine(room.ToString());
         }
+
+        public void RemoveUserFromAllRooms(User user)
+        {
+            foreach(var room in _rooms)
+            {
+                room.UsersInRoom.Remove(user);
+            }
+        }
     }
 }

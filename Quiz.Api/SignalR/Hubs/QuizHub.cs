@@ -78,6 +78,19 @@ namespace Quiz.Api.SignalR.Hubs
             await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.BuzzerPressed, roomId, user);
         }
 
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            var user = _userRepository.GetUser(Context.ConnectionId);
+            if (user != null)
+            {
+                _roomRepository.RemoveUserFromAllRooms(user);
+                _userRepository.RemoveUser(user.Id);
+                _logger.LogInformation("User {username} ({userId}) left", user.Name, user.Id);
+                await Clients.All.SendAsync(QuizHubMethods.UserLeftRoom, Context.ConnectionId);
+            }
+            await base.OnDisconnectedAsync(exception);
+        }
+
         private string GetRoomGroupName(int roomId)
         {
             return $"{RoomGroupNamePrefix}{roomId.ToString()}";
