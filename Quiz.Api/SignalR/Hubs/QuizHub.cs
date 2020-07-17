@@ -30,16 +30,19 @@ namespace Quiz.Api.SignalR.Hubs
 
         public async Task CreateRoom(string roomName, string roomPassword)
         {
-            var roomId = _roomRepository.AddRoom(new RoomInternalModel
+            var roomInternalModel = new RoomInternalModel
             {
                 Name = roomName,
                 Password = roomPassword,
                 OwnerUserIdentifier = Context.ConnectionId
-            });
+            };
+
+            var roomId = _roomRepository.AddRoom(roomInternalModel);
             _logger.LogInformation("Created room {roomId} {roomName}", roomId, roomName);
 
             var token = _jwtManager.GenerateJwtToken(roomId);
-            await Clients.Caller.SendAsync(QuizHubMethods.RoomCreated, token, roomId);
+            await Clients.Caller.SendAsync(QuizHubMethods.RoomCreateSuccess, token, roomId);
+            await Clients.All.SendAsync(QuizHubMethods.RoomCreated, roomInternalModel.ToDisplayModel());
         }
 
         public async Task JoinRoom(int roomId, string name)
@@ -99,6 +102,15 @@ namespace Quiz.Api.SignalR.Hubs
             user.Name = newUsername;
 
             await Clients.All.SendAsync(QuizHubMethods.UserUpdatedName, Context.ConnectionId, newUsername);
+        }
+
+        public async Task RemoveRoom(int roomId)
+        {
+            _logger.LogInformation("Removing room {roomId}", roomId);
+
+            _roomRepository.DeleteRoom(roomId);
+
+            await Clients.All.SendAsync(QuizHubMethods.RoomClosed, roomId);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

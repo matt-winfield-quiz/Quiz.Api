@@ -50,5 +50,11 @@ namespace Quiz.Api.Repositories
                 room.UsersInRoom.Remove(user);
             }
         }
+
+        public void DeleteRoom(int roomId)
+        {
+            var room = GetRoom(roomId);
+            _rooms.Remove(room);
+        }
     }
 }
