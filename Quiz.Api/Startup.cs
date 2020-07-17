@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Quiz.Api.Jwt;
 using Quiz.Api.Repositories;
 using Quiz.Api.Repositories.Interfaces;
 using Quiz.Api.SignalR.Hubs;
+using System.Linq;
 
 namespace Quiz.Api
 {
@@ -41,7 +44,7 @@ namespace Quiz.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -61,6 +64,9 @@ namespace Quiz.Api
                 endpoints.MapControllers();
                 endpoints.MapHub<QuizHub>("/QuizHub");
             });
+
+            var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
+            logger.LogInformation("Startup completed, listening on addresses {addresses}", serverAddressesFeature.Addresses.ToList());
         }
 
         private void ConfigureRepositories(IServiceCollection services)

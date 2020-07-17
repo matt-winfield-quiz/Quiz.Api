@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
-using Serilog.Sinks.File;
 using System;
 using System.Reflection;
 
@@ -71,7 +69,7 @@ namespace Quiz.Api
                 AutoRegisterTemplate = true,
                 IndexFormat = indexFormat,
                 ModifyConnectionSettings = x => x.BasicAuthentication(configuration["ElasticConfiguration:Username"], configuration["ElasticConfiguration:Password"]),
-                FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
+                FailureCallback = e => Console.WriteLine("ELASTICSEARCH FAIL - Unable to submit event " + e.MessageTemplate),
                 EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog | EmitEventFailureHandling.RaiseCallback
             };
             return options;
