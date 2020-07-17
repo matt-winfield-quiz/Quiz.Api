@@ -8,5 +8,6 @@
         public const string UserJoinRoomSuccess = "UserJoinRoomSuccess";
         public const string UserJoinRoomFail = "UserJoinRoomFail";
         public const string UserLeftRoom = "UserLeftRoom";
+        public const string UserUpdatedName = "UserUpdatedName";
     }
 }

@@ -75,7 +75,17 @@ namespace Quiz.Api.SignalR.Hubs
 
             var user = _userRepository.GetUser(Context.ConnectionId);
 
-            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.BuzzerPressed, roomId, user);
+            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.BuzzerPressed, user);
+        }
+
+        public async Task UpdateUsername(string newUsername)
+        {
+            _logger.LogInformation("Updating username for {connectionId} to {newUsername}", Context.ConnectionId, newUsername);
+
+            var user = _userRepository.GetUser(Context.ConnectionId);
+            user.Name = newUsername;
+
+            await Clients.All.SendAsync(QuizHubMethods.UserUpdatedName, Context.ConnectionId, newUsername);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
