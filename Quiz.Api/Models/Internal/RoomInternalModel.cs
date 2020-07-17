@@ -8,7 +8,6 @@ namespace Quiz.Api.Models.Internal
         public int Id { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
-        public string OwnerUserIdentifier { get; set; }
         public List<User> UsersInRoom { get; set; }
 
         public RoomInternalModel()

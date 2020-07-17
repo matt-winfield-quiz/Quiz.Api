@@ -33,8 +33,7 @@ namespace Quiz.Api.SignalR.Hubs
             var roomInternalModel = new RoomInternalModel
             {
                 Name = roomName,
-                Password = roomPassword,
-                OwnerUserIdentifier = Context.ConnectionId
+                Password = roomPassword
             };
 
             var roomId = _roomRepository.AddRoom(roomInternalModel);
@@ -45,9 +44,18 @@ namespace Quiz.Api.SignalR.Hubs
             await Clients.All.SendAsync(QuizHubMethods.RoomCreated, roomInternalModel.ToDisplayModel());
         }
 
-        public async Task JoinRoom(int roomId, string name)
+        public async Task JoinRoom(int roomId, string name, string roomPassword)
         {
             var roomGroupName = GetRoomGroupName(roomId);
+
+            var room = _roomRepository.GetRoom(roomId);
+
+            if (roomPassword != room.Password)
+            {
+                _logger.LogInformation("Invalid password entered for room {roomId} by conneciton {connectionId}", roomId, Context.ConnectionId);
+                await Clients.Caller.SendAsync(QuizHubMethods.UserJoinRoomFail, "INCORRECT_PASSWORD");
+                return;
+            }
 
             var newUser = new User
             {
