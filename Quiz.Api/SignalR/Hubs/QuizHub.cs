@@ -13,15 +13,17 @@ namespace Quiz.Api.SignalR.Hubs
     {
         private IRoomRepository _roomRepository;
         private IUserRepository _userRepository;
+        private IScoreRepository _scoreRepository;
         private JwtManager _jwtManager;
         private ILogger<QuizHub> _logger;
 
         private const string RoomGroupNamePrefix = "Room";
 
-        public QuizHub(IRoomRepository roomRepository, IUserRepository userRepository, JwtManager jwtManager, ILogger<QuizHub> logger)
+        public QuizHub(IRoomRepository roomRepository, IUserRepository userRepository, IScoreRepository scoreRepository, JwtManager jwtManager, ILogger<QuizHub> logger)
         {
             _roomRepository = roomRepository;
             _userRepository = userRepository;
+            _scoreRepository = scoreRepository;
             _jwtManager = jwtManager;
             _logger = logger;
         }
@@ -73,9 +75,20 @@ namespace Quiz.Api.SignalR.Hubs
         {
             _logger.LogInformation("Buzz triggered by {connectionId}", Context.ConnectionId);
 
+            var buzzResult = _scoreRepository.RegisterBuzz(roomId, Context.ConnectionId);
+
             var user = _userRepository.GetUser(Context.ConnectionId);
 
-            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.BuzzerPressed, user);
+            await Clients.Caller.SendAsync(QuizHubMethods.BuzzerPressSuccess, buzzResult);
+            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.BuzzerPressed, user, buzzResult);
+        }
+
+        public async Task ClearScores(int roomId)
+        {
+            _logger.LogInformation("Scores cleared for room {roomId} by {connectionId}", roomId, Context.ConnectionId);
+            _scoreRepository.ResetScoresForRoom(roomId);
+
+            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.ScoresCleared);
         }
 
         public async Task UpdateUsername(string newUsername)

@@ -67,6 +67,7 @@ namespace Quiz.Api
         {
             services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
             services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+            services.AddSingleton<IScoreRepository, InMemoryScoreRepository>();
         }
     }
 }
