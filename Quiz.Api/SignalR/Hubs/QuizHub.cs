@@ -52,7 +52,7 @@ namespace Quiz.Api.SignalR.Hubs
 
             if (roomPassword != room.Password)
             {
-                _logger.LogInformation("Invalid password entered for room {roomId} by conneciton {connectionId}", roomId, Context.ConnectionId);
+                _logger.LogInformation("Invalid password entered for room {roomId} by connection {connectionId}", roomId, Context.ConnectionId);
                 await Clients.Caller.SendAsync(QuizHubMethods.UserJoinRoomFail, "INCORRECT_PASSWORD");
                 return;
             }
