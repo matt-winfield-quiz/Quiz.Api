@@ -59,6 +59,11 @@ namespace Quiz.Api
 
             app.UseCors(CorsPolicyName);
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
