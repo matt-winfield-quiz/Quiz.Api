@@ -9,6 +9,7 @@ using Quiz.Api.Jwt;
 using Quiz.Api.Repositories;
 using Quiz.Api.Repositories.Interfaces;
 using Quiz.Api.SignalR.Hubs;
+using Serilog;
 using System.Linq;
 
 namespace Quiz.Api
@@ -31,6 +32,7 @@ namespace Quiz.Api
             services.AddSignalR();
 
             string[] allowedHosts = Configuration.GetSection("CorsAllowedHosts").Get<string[]>();
+            Log.Information("CORS allowed hosts configured as {allowedHosts}", allowedHosts);
             services.AddCors(o => o.AddPolicy(CorsPolicyName, builder =>
             {
                 builder.AllowAnyMethod()
