@@ -50,6 +50,13 @@ namespace Quiz.Api.SignalR.Hubs
 
             var room = _roomRepository.GetRoom(roomId);
 
+            if (room == null)
+            {
+                _logger.LogInformation("User {name} ({connectionId}) attempted to join room {roomId} that does not exist", name, Context.ConnectionId, roomId);
+                await Clients.Caller.SendAsync(QuizHubMethods.UserJoinRoomFail, "ROOM_NOT_FOUND");
+                return;
+            }
+
             if (roomPassword != room.Password)
             {
                 _logger.LogInformation("Invalid password entered for room {roomId} by connection {connectionId}", roomId, Context.ConnectionId);
