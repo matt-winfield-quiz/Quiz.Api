@@ -14,5 +14,6 @@
         public const string ScoresCleared = "ScoresCleared";
         public const string RoomClosed = "RoomClosed";
         public const string InvalidJwtToken = "InvalidJwtToken";
+        public const string UserScoreUpdated = "UserScoreUpdated";
     }
 }

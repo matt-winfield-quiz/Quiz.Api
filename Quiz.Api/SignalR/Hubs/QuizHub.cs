@@ -111,7 +111,7 @@ namespace Quiz.Api.SignalR.Hubs
             }
 
             _logger.LogInformation("Scores cleared for room {roomId} by {connectionId}", roomId, Context.ConnectionId);
-            _scoreRepository.ResetScoresForRoom(roomId);
+            _scoreRepository.ResetTimesForRoom(roomId);
 
             await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.ScoresCleared);
         }
@@ -139,6 +139,34 @@ namespace Quiz.Api.SignalR.Hubs
             _roomRepository.DeleteRoom(roomId);
 
             await Clients.All.SendAsync(QuizHubMethods.RoomClosed, roomId);
+        }
+
+        public async Task IncrementUserScore(string userId, int roomId, string jwtToken)
+        {
+            if (!IsOwnerOfRoom(roomId, jwtToken))
+            {
+                await Clients.Caller.SendAsync(QuizHubMethods.InvalidJwtToken, roomId);
+                return;
+            }
+
+            _logger.LogInformation("Incrementing {userId} score", userId);
+
+            var newScore = _scoreRepository.IncrementUserScore(userId, roomId);
+            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.UserScoreUpdated, userId, newScore);
+        }
+
+        public async Task DecrementUserScore(string userId, int roomId, string jwtToken)
+        {
+            if (!IsOwnerOfRoom(roomId, jwtToken))
+            {
+                await Clients.Caller.SendAsync(QuizHubMethods.InvalidJwtToken, roomId);
+                return;
+            }
+
+            _logger.LogInformation("Decrementing {userId} score", userId);
+
+            var newScore = _scoreRepository.DecrementUserScore(userId, roomId);
+            await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.UserScoreUpdated, userId, newScore);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

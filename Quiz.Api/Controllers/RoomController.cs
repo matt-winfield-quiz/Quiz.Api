@@ -13,11 +13,13 @@ namespace Quiz.Api.Controllers
     public class RoomController : ControllerBase
     {
         private IRoomRepository _roomRepository;
+        private IScoreRepository _scoreRepository;
         private ILogger<RoomController> _logger;
 
-        public RoomController(IRoomRepository roomRepository, ILogger<RoomController> logger)
+        public RoomController(IRoomRepository roomRepository, IScoreRepository scoreRepository, ILogger<RoomController> logger)
         {
             _roomRepository = roomRepository;
+            _scoreRepository = scoreRepository;
             _logger = logger;
         }
 
@@ -44,6 +46,15 @@ namespace Quiz.Api.Controllers
             }
             _logger.LogInformation("GetRoom {roomId} not found", roomId);
             return NotFound(room);
+        }
+
+        [HttpGet("scores")]
+        public ActionResult<Dictionary<string, int>> GetRoomScores([FromQuery] int roomId)
+        {
+            var scores = _scoreRepository.GetUserScores(roomId);
+
+            _logger.LogInformation("GetRoomScores OK");
+            return Ok(scores);
         }
     }
 }
