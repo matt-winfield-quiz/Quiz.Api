@@ -11,8 +11,6 @@ namespace Quiz.Api.Jwt
         private readonly byte[] PRIVATE_KEY = new byte[256];
         private readonly JwtSecurityTokenHandler _tokenHandler;
 
-        private const string RoomIdClaimType = "roomId";
-
         public JwtManager()
         {
             var randomNumberGenerator = new RNGCryptoServiceProvider();
@@ -24,7 +22,7 @@ namespace Quiz.Api.Jwt
         public string GenerateJwtToken(int roomId)
         {
             ClaimsIdentity claims = new ClaimsIdentity();
-            claims.AddClaim(new Claim(RoomIdClaimType, roomId.ToString()));
+            claims.AddClaim(new Claim(QuizJwtClaimTypes.RoomId, roomId.ToString()));
 
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(PRIVATE_KEY), SecurityAlgorithms.HmacSha256Signature);
 

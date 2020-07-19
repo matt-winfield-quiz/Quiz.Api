@@ -5,6 +5,7 @@ using Quiz.Api.Models.Display;
 using Quiz.Api.Models.Internal;
 using Quiz.Api.Repositories.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Quiz.Api.SignalR.Hubs
@@ -101,8 +102,14 @@ namespace Quiz.Api.SignalR.Hubs
             await Clients.Group(GetRoomGroupName(roomId)).SendAsync(QuizHubMethods.BuzzerPressed, user, buzzResult);
         }
 
-        public async Task ClearScores(int roomId)
+        public async Task ClearScores(int roomId, string jwtToken)
         {
+            if (!IsOwnerOfRoom(roomId, jwtToken))
+            {
+                await Clients.Caller.SendAsync(QuizHubMethods.InvalidJwtToken, roomId);
+                return;
+            }
+
             _logger.LogInformation("Scores cleared for room {roomId} by {connectionId}", roomId, Context.ConnectionId);
             _scoreRepository.ResetScoresForRoom(roomId);
 
@@ -119,8 +126,14 @@ namespace Quiz.Api.SignalR.Hubs
             await Clients.All.SendAsync(QuizHubMethods.UserUpdatedName, Context.ConnectionId, newUsername);
         }
 
-        public async Task RemoveRoom(int roomId)
+        public async Task RemoveRoom(int roomId, string jwtToken)
         {
+            if (!IsOwnerOfRoom(roomId, jwtToken))
+            {
+                await Clients.Caller.SendAsync(QuizHubMethods.InvalidJwtToken, roomId);
+                return;
+            }
+
             _logger.LogInformation("Removing room {roomId}", roomId);
 
             _roomRepository.DeleteRoom(roomId);
@@ -139,6 +152,36 @@ namespace Quiz.Api.SignalR.Hubs
                 await Clients.All.SendAsync(QuizHubMethods.UserLeftRoom, Context.ConnectionId);
             }
             await base.OnDisconnectedAsync(exception);
+        }
+
+        private bool IsOwnerOfRoom(int roomId, string jwtToken)
+        {
+            if (!_jwtManager.ValidateToken(jwtToken))
+            {
+                _logger.LogInformation("Invalid token supplied by {connectiondId} for room {roomId}", Context.ConnectionId, roomId);
+                return false;
+            }
+
+            var claims = _jwtManager.GetTokenClaims(jwtToken);
+            var roomIdClaim = claims.FirstOrDefault(claim => claim.Type.Equals(QuizJwtClaimTypes.RoomId));
+
+            if (roomIdClaim == null)
+            {
+                _logger.LogInformation("Invalid token supplied by {connectiondId} for room {roomId} - token does not have {claimType} claim type",
+                    Context.ConnectionId, roomId, QuizJwtClaimTypes.RoomId);
+
+                return false;
+            }
+
+            if (roomIdClaim.Value != roomId.ToString())
+            {
+                _logger.LogInformation("Invalid token supplied by {connectionId} for room {roomId} - token claim is for {tokenClaimRoomId} but expected {roomId}",
+                    Context.ConnectionId, roomId, roomIdClaim.Value);
+
+                return false;
+            }
+
+            return true;
         }
 
         private string GetRoomGroupName(int roomId)
